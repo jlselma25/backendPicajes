@@ -5,10 +5,11 @@
 const config=  {
     user: 'sa',
     password: 'pk',
-    server: '192.168.1.200', 
+    //server: '192.168.1.200', 
+    server:'supercarmelaoficina.dvrdns.org',
    //server:'SERVIDORNEW',   
-   // database: 'BDPicajes',
-    database:'supercarmelaoficina.dvrdns.org',
+    database: 'BDPicajes',
+   
     port: 1433,
     options: {
         encrypt: false, // Usa `true` si tu servidor requiere encriptación
