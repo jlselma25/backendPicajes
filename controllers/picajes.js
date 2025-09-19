@@ -117,6 +117,13 @@ const { config } = require('../database/config');
   
    }
 
+
+   
+   Status = async(req, res = response ) => {
+
+     return res.json({ resul: 1});
+   }
+
    
 
   function formatoFecha(fecha, tipoFormato){
@@ -147,5 +154,5 @@ const { config } = require('../database/config');
 
 
     module.exports = {       
-    ComprobarDni,InsertarPicaje
+    ComprobarDni,InsertarPicaje,Status
  }
