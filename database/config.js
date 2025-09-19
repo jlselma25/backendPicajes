@@ -7,7 +7,8 @@ const config=  {
     password: 'pk',
     server: '192.168.1.200', 
    //server:'SERVIDORNEW',   
-    database: 'BDPicajes',
+   // database: 'BDPicajes',
+    database:'supercarmelaoficina.dvrdns.org',
     port: 1433,
     options: {
         encrypt: false, // Usa `true` si tu servidor requiere encriptación
