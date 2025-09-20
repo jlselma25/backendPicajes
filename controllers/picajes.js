@@ -70,7 +70,7 @@ const { config } = require('../database/config');
         row = data[0];         
 
         if (!row) {
-            return res.json({ resul: 2 }); // No encontrado
+            return res.json({ resul: -3 }); // No encontrado
         }
 
         const regexDNI = /^\d{8}[A-Z]$/;
@@ -92,7 +92,7 @@ const { config } = require('../database/config');
                 default: return res.json({ resul: 2 });
             }
         } else {
-            return res.json({ resul: 2 }); // Formato inválido
+            return res.json({ resul: -2 }); // Formato inválido
         }
 
         if (!/^\d+$/.test(numeroStr)) {
