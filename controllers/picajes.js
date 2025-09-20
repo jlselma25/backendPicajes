@@ -3,6 +3,7 @@ const { executeQuery } = require('../database/operations');
 const moment = require('moment');
 const sql = require('mssql');
 const { config } = require('../database/config');
+const { desencriptarDNI } = require('../helpers/aes_desencryter');
 
 
 
@@ -61,10 +62,12 @@ const { config } = require('../database/config');
          return res.json({ resul: 0 });
      }
 
-      try {
+      try {      
 
-        const query = `SELECT * FROM Empleados WHERE DNI = '${dni}'`;
+       
+        const dniDecrypter = desencriptarDNI(dni);      
 
+        const query = `SELECT * FROM Empleados WHERE DNI = '${dniDecrypter}'`;
         
         data = await executeQuery(query);  
         row = data[0];         
@@ -80,11 +83,11 @@ const { config } = require('../database/config');
         let numeroStr = '';
         let numero = 0;
 
-        if (regexDNI.test(dni)) {
-            numeroStr = dni.substring(0, 8);
-        } else if (regexNIE.test(dni)) {
-            const letraInicial = dni[0];
-            const num = dni.substring(1, 8);
+        if (regexDNI.test(dniDecrypter)) {
+            numeroStr = dniDecrypter.substring(0, 8);
+        } else if (regexNIE.test(dniDecrypter)) {
+            const letraInicial = dniDecrypter[0];
+            const num = dniDecrypter.substring(1, 8);
             switch (letraInicial) {
                 case 'X': numeroStr = '0' + num; break;
                 case 'Y': numeroStr = '1' + num; break;
@@ -101,7 +104,7 @@ const { config } = require('../database/config');
 
         numero = parseInt(numeroStr);
         const letraCalculada = letrasControl[numero % 23];
-        const letraReal = dni[dni.length - 1];
+        const letraReal = dniDecrypter[dniDecrypter.length - 1];
 
         if (letraCalculada !== letraReal) {
             return res.json({ resul: 0 }); // Letra incorrecta
