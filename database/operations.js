@@ -1,12 +1,12 @@
 // dbOperations.js
 const sql = require('mssql');
-const { config } = require('../database/config');
+const { crearConfig } = require('../database/config');
 
-async function executeQuery(query) {
+async function executeQuery(query,conexion) {
     let pool;
     try {
         // Conectar a la base de datos     
-      
+        const config = crearConfig('sa', 'pk', conexion, 'BDPicajes');
         pool = await sql.connect(config);     
         
         // Ejecutar la consulta

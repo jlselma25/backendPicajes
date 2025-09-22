@@ -2,7 +2,7 @@ const { response } = require('express');
 const { executeQuery } = require('../database/operations');
 const moment = require('moment');
 const sql = require('mssql');
-const { config } = require('../database/config');
+//const { config } = require('../database/config');
 const { desencriptarDNI } = require('../helpers/aes_desencryter');
 
 
@@ -10,10 +10,12 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
  InsertarPicaje = async(req, res = response ) => {
 
     const { empleado } = req.query; 
+    const { conexion } = req.query; 
     const ahora = new Date(); 
     let fecha = formatoFecha(ahora,2);      
-  
-    let row ;   
+
+    const conexionDecrypter = desencriptarDNI(conexion);   
+    
     let data;
     let tipo;
 
@@ -24,7 +26,7 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
         fecha = formatoFecha(ahora,1);
         const fechaFormateada = moment(fecha, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');              
 
-        data = await executeQuery(query);         
+        data = await executeQuery(query,conexionDecrypter);         
         const row = data[0];
 
         if (!row) {            
@@ -39,7 +41,7 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
             }
         }      
         query ="INSERT INTO Picajes (Fecha,Empleado,Tipo) VALUES ('" + fechaFormateada + "'," + empleado  + ",'" + tipo + "')";               
-        await executeQuery(query);                
+        await executeQuery(query,conexionDecrypter);                
         return res.json({
              resul: 1});
     
@@ -57,19 +59,22 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
     let data;
     
     const { dni } = req.query;    
+    const { conexion } = req.query;     
    
      if (!dni || dni.length === 0) {
          return res.json({ resul: 0 });
      }
 
       try {      
-
        
         const dniDecrypter = desencriptarDNI(dni);      
-
-        const query = `SELECT * FROM Empleados WHERE DNI = '${dniDecrypter}'`;
+        const conexionDecrypter = desencriptarDNI(conexion);   
         
-        data = await executeQuery(query);  
+       
+
+        const query = `SELECT * FROM Empleados WHERE DNI = '${dniDecrypter}'`;      
+        
+        data = await executeQuery(query,conexionDecrypter);  
         row = data[0];         
 
         if (!row) {
