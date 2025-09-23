@@ -68,9 +68,11 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
      }
 
       try {       
-
-        const dniDecrypter = desencriptarDNI(dni);          
+               
+        const dniURI = decodeURIComponent(dni); 
         const conexionURI = decodeURIComponent(conexion);       
+
+        const dniDecrypter = desencriptarDNI(dniURI); 
         const conexionDecrypter = desencriptarDNI(conexionURI);   
 
         const query = `SELECT * FROM Empleados WHERE DNI = '${dniDecrypter}'`;      
