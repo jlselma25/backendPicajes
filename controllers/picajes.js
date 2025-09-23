@@ -12,9 +12,11 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
     const { empleado } = req.query; 
     const { conexion } = req.query; 
     const ahora = new Date(); 
-    let fecha = formatoFecha(ahora,2);      
+    
+    let fecha = formatoFecha(ahora,2);   
 
-    const conexionDecrypter = desencriptarDNI(conexion);   
+    const conexionURI = decodeURIComponent(conexion);
+    const conexionDecrypter = desencriptarDNI(conexionURI);   
     
     let data;
     let tipo;
@@ -65,12 +67,11 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
          return res.json({ resul: 0 });
      }
 
-      try {      
-       
-        const dniDecrypter = desencriptarDNI(dni);      
-        const conexionDecrypter = desencriptarDNI(conexion);   
-        
-       
+      try {       
+
+        const dniDecrypter = desencriptarDNI(dni);          
+        const conexionURI = decodeURIComponent(conexion);       
+        const conexionDecrypter = desencriptarDNI(conexionURI);   
 
         const query = `SELECT * FROM Empleados WHERE DNI = '${dniDecrypter}'`;      
         

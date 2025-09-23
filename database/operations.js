@@ -6,6 +6,8 @@ async function executeQuery(query,conexion) {
     let pool;
     try {
         // Conectar a la base de datos     
+
+      console.log('config22222 ' + conexion);
         const config = crearConfig('sa', 'pk', conexion, 'BDPicajes');
         pool = await sql.connect(config);     
         
