@@ -1,6 +1,7 @@
 const { response } = require('express');
 const { executeQuery } = require('../database/operations');
 const moment = require('moment');
+//const moment = require('moment-timezone')
 const sql = require('mssql');
 //const { config } = require('../database/config');
 const { desencriptarDNI } = require('../helpers/aes_desencryter');
@@ -12,37 +13,49 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
     const { empleado } = req.query; 
     const { conexion } = req.query; 
     const ahora = new Date(); 
+    const formato = 'DD/MM/YYYY HH:mm';
+    let diferenciaMinutos = 0;
     
     let fecha = formatoFecha(ahora,2);   
 
     const conexionURI = decodeURIComponent(conexion);
-    const conexionDecrypter = desencriptarDNI(conexionURI);   
+    const conexionDecrypter = desencriptarDNI(conexionURI);  
+    
+    // const horaLocal = moment().tz('Europe/Madrid').format();
+    // console.log(horaLocal);
     
     let data;
     let tipo;
 
     try{
         
-        let query = `SELECT TOP 1 Tipo FROM Picajes WHERE Empleado = ${empleado} AND CONVERT(date, fecha ) = '${fecha}'  ORDER BY Fecha DESC`;      
-
+        let query = `SELECT TOP 1 Tipo , Fecha FROM Picajes WHERE Empleado = ${empleado} AND CONVERT(date, fecha ) = '${fecha}'  ORDER BY Fecha DESC`;      
+            
         fecha = formatoFecha(ahora,1);
         const fechaFormateada = moment(fecha, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');              
 
+       
         data = await executeQuery(query,conexionDecrypter);         
-        const row = data[0];
+        const row = data[0];        
 
+         
         if (!row) {            
             tipo ='E';
             
         }else{
             
             if (row.Tipo =='E'){
-                tipo ='S'
+                tipo ='S';
+                
+                const fechaSQL =  moment(formatoFecha(row.Fecha,1), formato); 
+                const fechaMoment = moment(fecha,  formato);               
+                diferenciaMinutos = fechaSQL.diff(fechaMoment, 'minutes') * -1;
             }else{
                 tipo ='E';
             }
         }      
-        query ="INSERT INTO Picajes (Fecha,Empleado,Tipo) VALUES ('" + fechaFormateada + "'," + empleado  + ",'" + tipo + "')";               
+        query ="INSERT INTO Picajes (Fecha,Empleado,Tipo,Minutos) VALUES ('" + fechaFormateada + "'," + empleado  + ",'" + tipo + "'," + diferenciaMinutos + ")";  
+       
         await executeQuery(query,conexionDecrypter);                
         return res.json({
              resul: 1});
@@ -72,7 +85,7 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
         const dniURI = decodeURIComponent(dni); 
         //const conexionURI = decodeURIComponent('XsgW23XOAIGfN4TjRCPDlZP70D%2BO%2B7ClH%2FyhBsuOKww%3D');
        
-        const conexionURI = decodeURIComponent(conexion);     
+        const conexionURI = decodeURIComponent(conexion);        
 
 
         const dniDecrypter = desencriptarDNI(dniURI); 

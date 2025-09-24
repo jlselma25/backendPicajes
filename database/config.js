@@ -27,7 +27,8 @@ function crearConfig(user, password, server, database, port = 1433) {
     port,
     options: {
       encrypt: false,
-      trustServerCertificate: false
+      trustServerCertificate: false,
+      useUTC: false
     }
   };
 }
