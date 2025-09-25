@@ -15,6 +15,7 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
     const ahora = new Date(); 
     const formato = 'DD/MM/YYYY HH:mm';
     let diferenciaMinutos = 0;
+    let idEntrada  = 0;
     
     let fecha = formatoFecha(ahora,2);   
 
@@ -29,7 +30,7 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
 
     try{
         
-        let query = `SELECT TOP 1 Tipo , Fecha FROM Picajes WHERE Empleado = ${empleado} AND CONVERT(date, fecha ) = '${fecha}'  ORDER BY Fecha DESC`;      
+        let query = `SELECT TOP 1 Tipo , Fecha, id FROM Picajes WHERE Empleado = ${empleado} AND CONVERT(date, fecha ) = '${fecha}'  ORDER BY Fecha DESC`;      
             
         fecha = formatoFecha(ahora,1);
         const fechaFormateada = moment(fecha, 'DD/MM/YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss');              
@@ -50,11 +51,12 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
                 const fechaSQL =  moment(formatoFecha(row.Fecha,1), formato); 
                 const fechaMoment = moment(fecha,  formato);               
                 diferenciaMinutos = fechaSQL.diff(fechaMoment, 'minutes') * -1;
+                idEntrada = row.id;
             }else{
                 tipo ='E';
             }
         }      
-        query ="INSERT INTO Picajes (Fecha,Empleado,Tipo,Minutos) VALUES ('" + fechaFormateada + "'," + empleado  + ",'" + tipo + "'," + diferenciaMinutos + ")";  
+        query ="INSERT INTO Picajes (Fecha,Empleado,Tipo,Minutos,Entrada) VALUES ('" + fechaFormateada + "'," + empleado  + ",'" + tipo + "'," + diferenciaMinutos + "," + idEntrada + ")";  
        
         await executeQuery(query,conexionDecrypter);                
         return res.json({
