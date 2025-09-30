@@ -48,7 +48,7 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
             if (row.Tipo =='E'){
                 tipo ='S';
                 
-                const fechaSQL =  moment(formatoFecha(row.Fecha,1), formato); 
+                const fechaSQL =  moment(formatoFecha(row.Fecha,1), formato);                
                 const fechaMoment = moment(fecha,  formato);               
                 diferenciaMinutos = fechaSQL.diff(fechaMoment, 'minutes') * -1;
                 idEntrada = row.id;
@@ -164,6 +164,7 @@ CargarRegistros = async(req, res = response ) => {
     const { conexion } = req.query; 
     const ahora = new Date();    
     let fecha = formatoFecha(ahora,2);   
+    const formato = 'DD/MM/YYYY';
 
     const conexionURI = decodeURIComponent(conexion);
     const conexionDecrypter = desencriptarDNI(conexionURI);  
@@ -182,7 +183,7 @@ CargarRegistros = async(req, res = response ) => {
         data = await executeQuery(query,conexionDecrypter);   
         
          const mappedData = data.map(row => ({
-            fecha: row.Fecha, 
+            fecha:  moment(row.Fecha).format('DD/MM/YYYY HH:mm'),
             tipo: row.Tipo 
         }));
        
@@ -199,7 +200,7 @@ CargarRegistros = async(req, res = response ) => {
    
 
   function formatoFecha(fecha, tipoFormato){
-       
+    
     const dd = String(fecha.getUTCDate()).padStart(2, '0');
     const mm = String(fecha.getUTCMonth() + 1).padStart(2, '0'); // Mes empieza en 0
     const yyyy = fecha.getUTCFullYear();
