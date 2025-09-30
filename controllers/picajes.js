@@ -77,6 +77,8 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
     
     const { dni } = req.query;    
     const { conexion } = req.query;     
+
+    
    
      if (!dni || dni.length === 0) {
          return res.json({ resul: 0 });
@@ -87,21 +89,21 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
         const dniURI = decodeURIComponent(dni); 
         //const conexionURI = decodeURIComponent('XsgW23XOAIGfN4TjRCPDlZP70D%2BO%2B7ClH%2FyhBsuOKww%3D');
        
-        const conexionURI = decodeURIComponent(conexion);        
-
-
+        const conexionURI = decodeURIComponent(conexion);
+        
         const dniDecrypter = desencriptarDNI(dniURI); 
         const conexionDecrypter = desencriptarDNI(conexionURI);         
 
-        const query = `SELECT * FROM Empleados WHERE DNI = '${dniDecrypter}'`;      
-        
+        const query = `SELECT * FROM Empleados WHERE DNI = '${dniDecrypter}'`;             
+       
         data = await executeQuery(query,conexionDecrypter);  
-        row = data[0];         
+        row = data[0]; 
+        
 
-        if (!row) {
+        if (!row) {           
             return res.json({ resul: -3 }); // No encontrado
         }
-
+ 
         const regexDNI = /^\d{8}[A-Z]$/;
         const regexNIE = /^[XYZ]\d{7}[A-Z]$/;
 
@@ -109,9 +111,10 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
         let numeroStr = '';
         let numero = 0;
 
-        if (regexDNI.test(dniDecrypter)) {
+        if (regexDNI.test(dniDecrypter)) {            
             numeroStr = dniDecrypter.substring(0, 8);
         } else if (regexNIE.test(dniDecrypter)) {
+           
             const letraInicial = dniDecrypter[0];
             const num = dniDecrypter.substring(1, 8);
             switch (letraInicial) {
@@ -120,23 +123,24 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
                 case 'Z': numeroStr = '2' + num; break;
                 default: return res.json({ resul: 2 });
             }
-        } else {
+        } else {            
             return res.json({ resul: -2 }); // Formato inválido
         }
-
-        if (!/^\d+$/.test(numeroStr)) {
+ 
+        if (!/^\d+$/.test(numeroStr)) {            
             return res.json({ resul: 0 });
         }
 
         numero = parseInt(numeroStr);
         const letraCalculada = letrasControl[numero % 23];
         const letraReal = dniDecrypter[dniDecrypter.length - 1];
-
-        if (letraCalculada !== letraReal) {
+ 
+        if (letraCalculada !== letraReal) {             
             return res.json({ resul: 0 }); // Letra incorrecta
         }
 
     // Si todo es correcto, devolver el número del empleado
+    
     return res.json({ resul: row.Numero });
 
       } catch (err) {
@@ -153,6 +157,45 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
      return res.json({ resul: 1});
    }
 
+
+CargarRegistros = async(req, res = response ) => {
+
+    const { empleado } = req.query; 
+    const { conexion } = req.query; 
+    const ahora = new Date();    
+    let fecha = formatoFecha(ahora,2);   
+
+    const conexionURI = decodeURIComponent(conexion);
+    const conexionDecrypter = desencriptarDNI(conexionURI);  
+    
+    // const horaLocal = moment().tz('Europe/Madrid').format();
+    // console.log(horaLocal);
+    
+    let data;
+    let tipo;
+
+    try{
+        
+        const query = `SELECT Tipo , Fecha, id FROM Picajes WHERE Empleado = ${empleado} AND CONVERT(date, fecha ) = '${fecha}'  ORDER BY Fecha DESC`;                 
+        
+
+        data = await executeQuery(query,conexionDecrypter);   
+        
+         const mappedData = data.map(row => ({
+            fecha: row.Fecha, 
+            tipo: row.Tipo 
+        }));
+       
+        return res.json(mappedData);    
+    
+     }catch(err){
+         console.log('Error insertando '  + err);
+         return res.json({
+             fecha: '',
+             tipo: ''
+            });
+     }
+ }
    
 
   function formatoFecha(fecha, tipoFormato){
@@ -178,10 +221,8 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
  }
 
 
-
-
-
-
     module.exports = {       
-    ComprobarDni,InsertarPicaje,Status
+    ComprobarDni,InsertarPicaje,Status,CargarRegistros
+
+
  }
