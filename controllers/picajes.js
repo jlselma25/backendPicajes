@@ -10,6 +10,13 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
 
  InsertarPicaje = async(req, res = response ) => {
 
+    const apiKey = req.header('x-api-key');  
+    
+    if (apiKey !== process.env.API_KEY) {
+        return res.status(401).json({ error: 'No autorizado' });
+    }
+
+
     const { empleado } = req.query; 
     const { conexion } = req.query; 
     const ahora = new Date(); 
@@ -71,6 +78,15 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
  }
 
  ComprobarDni = async(req, res = response ) => {
+    
+    
+    const apiKey = req.header('x-api-key');  
+    
+    if (apiKey !== process.env.API_KEY) {
+        return res.status(401).json({ error: 'No autorizado' });
+    }
+
+    
     
     let row ;   
     let data;
@@ -153,16 +169,6 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
 
    
    Status = async(req, res = response ) => {
-
-    const apiKey = req.header('x-api-key');  
-    //const expectedKey = 'f3c1a58e64bc93e71a4a2d2e6b7a8c0f';    
-
-  if (apiKey !== process.env.API_KEY) {
-    return res.status(401).json({ error: 'No autorizado' });
-  }
-    
-
-
      return res.json({ resul: 1});
    }
 
@@ -172,8 +178,8 @@ CargarRegistros = async(req, res = response ) => {
     const apiKey = req.header('x-api-key');  
     
     if (apiKey !== process.env.API_KEY) {
-    return res.status(401).json({ error: 'No autorizado' });
-  }
+        return res.status(401).json({ error: 'No autorizado' });
+    }
 
 
     const { empleado } = req.query; 
