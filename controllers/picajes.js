@@ -154,6 +154,15 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
    
    Status = async(req, res = response ) => {
 
+    const apiKey = req.header('x-api-key');  
+    //const expectedKey = 'f3c1a58e64bc93e71a4a2d2e6b7a8c0f';    
+
+  if (apiKey !== process.env.API_KEY) {
+    return res.status(401).json({ error: 'No autorizado' });
+  }
+    
+
+
      return res.json({ resul: 1});
    }
 
@@ -179,7 +188,7 @@ CargarRegistros = async(req, res = response ) => {
         
         const query = `SELECT Tipo , Fecha, id FROM Picajes WHERE Empleado = ${empleado} AND CONVERT(date, fecha ) = '${fecha}'  ORDER BY Fecha DESC`;                 
         
-
+console.log(query);
         data = await executeQuery(query,conexionDecrypter);   
         
          const mappedData = data.map(row => ({

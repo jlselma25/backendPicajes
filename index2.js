@@ -1,28 +1,9 @@
-const CryptoJS = require('crypto-js');
 
-// Deben coincidir EXACTAMENTE con los usados en Flutter
-const key = CryptoJS.enc.Utf8.parse('1234567890123456'); // 16 bytes
-const iv = CryptoJS.enc.Utf8.parse('abcdefghijklmnop');  // 16 bytes
 
-function desencriptarDNI(dniEncriptadoBase64) {
-  try {
-    const decrypted = CryptoJS.AES.decrypt(dniEncriptadoBase64, key, {
-      iv: iv,
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7
-    });
 
-    const resultado = decrypted.toString(CryptoJS.enc.Utf8);
+const crypto = require('crypto');
 
-    console.log("🔓 Desencriptado:", resultado || '[vacío]');
-    return resultado;
-  } catch (error) {
-    console.error("❌ Error al desencriptar:", error.message);
-    return null;
-  }
-}
+// Genera 16 bytes aleatorios y los convierte a hexadecimal
+const randomHex = crypto.randomBytes(16).toString('hex');
 
-// TEST: desde Flutter
-const textoEncriptado = '537SA9AF4G1m7ql7ita7DA=='; // <-- Este viene de Flutter
-
-desencriptarDNI(textoEncriptado);
+console.log(randomHex); // Ejemplo de salida: e4d3f6a7c8b9d1e2f3a4b5c6d7e8f901
