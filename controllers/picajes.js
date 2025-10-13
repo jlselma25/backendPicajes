@@ -169,6 +169,11 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
 
    
    Status = async(req, res = response ) => {
+    // const apiKey = req.header('x-api-key');  
+    
+    // if (apiKey !== process.env.API_KEY) {
+    //     return res.status(401).json({ error: 'No autorizado' });
+    // }
      return res.json({ resul: 1});
    }
 
