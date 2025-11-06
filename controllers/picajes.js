@@ -177,6 +177,13 @@ const { desencriptarDNI } = require('../helpers/aes_desencryter');
      return res.json({ resul: 1});
    }
 
+   Keepalive = async(req, res = response ) => {  
+     
+    return res.status(200).send('OK');
+}
+
+
+
 
 CargarRegistros = async(req, res = response ) => {
 
@@ -250,7 +257,7 @@ CargarRegistros = async(req, res = response ) => {
 
 
     module.exports = {       
-    ComprobarDni,InsertarPicaje,Status,CargarRegistros
+    ComprobarDni,InsertarPicaje,Status,CargarRegistros,Keepalive
 
 
  }
